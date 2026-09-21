@@ -953,7 +953,7 @@ ifdef BOARD_INCLUDE_DTB_IN_BOOTIMG
   INTERNAL_BOOTIMAGE_ARGS += --dtb $(INSTALLED_DTBIMAGE_TARGET)
 endif
 
-ifneq ($(BOARD_BUILD_SYSTEM_ROOT_IMAGE),true)
+ifneq ($(BOARD_BUILD_SYSTEM_ROOT_IMAGE)$(filter true,$(BOARD_BOOT_RAMDISK_WITH_SYSTEM_ROOT)),true)
 INTERNAL_BOOTIMAGE_ARGS += --ramdisk $(INSTALLED_RAMDISK_TARGET)
 endif
 
@@ -3888,7 +3888,7 @@ endif # INSTALLED_RECOVERYIMAGE_TARGET defined or BOARD_USES_RECOVERY_AS_BOOT is
 	    $(TARGET_ROOT_OUT),$(zip_root)/ROOT)
 	@# If we are using recovery as boot, this is already done when processing recovery.
 ifneq ($(BOARD_USES_RECOVERY_AS_BOOT),true)
-ifneq ($(BOARD_BUILD_SYSTEM_ROOT_IMAGE),true)
+ifneq ($(BOARD_BUILD_SYSTEM_ROOT_IMAGE)$(filter true,$(BOARD_BOOT_RAMDISK_WITH_SYSTEM_ROOT)),true)
 	$(hide) $(call package_files-copy-root, \
 	    $(TARGET_RAMDISK_OUT),$(zip_root)/BOOT/RAMDISK)
 endif
@@ -4015,6 +4015,7 @@ ifdef PRODUCT_EXTRA_RECOVERY_KEYS
 	$(hide) echo "extra_recovery_keys=$(PRODUCT_EXTRA_RECOVERY_KEYS)" >> $(zip_root)/META/misc_info.txt
 endif
 	$(hide) echo 'mkbootimg_args=$(BOARD_MKBOOTIMG_ARGS)' >> $(zip_root)/META/misc_info.txt
+	$(hide) echo 'boot_ramdisk_with_system_root=$(BOARD_BOOT_RAMDISK_WITH_SYSTEM_ROOT)' >> $(zip_root)/META/misc_info.txt
 	$(hide) echo 'mkbootimg_version_args=$(INTERNAL_MKBOOTIMG_VERSION_ARGS)' >> $(zip_root)/META/misc_info.txt
 	$(hide) echo "use_set_metadata=1" >> $(zip_root)/META/misc_info.txt
 	$(hide) echo "multistage_support=1" >> $(zip_root)/META/misc_info.txt
@@ -4187,8 +4188,8 @@ ifeq ($(BOARD_USES_RECOVERY_AS_BOOT),true)
 	@# BOOT/RAMDISK exists and contains the ramdisk for recovery if using BOARD_USES_RECOVERY_AS_BOOT.
 	$(hide) $(call fs_config,$(zip_root)/BOOT/RAMDISK,) > $(zip_root)/META/boot_filesystem_config.txt
 endif
-ifneq ($(BOARD_BUILD_SYSTEM_ROOT_IMAGE),true)
-	@# BOOT/RAMDISK also exists and contains the first stage ramdisk if not using BOARD_BUILD_SYSTEM_ROOT_IMAGE.
+ifneq ($(BOARD_BUILD_SYSTEM_ROOT_IMAGE)$(filter true,$(BOARD_BOOT_RAMDISK_WITH_SYSTEM_ROOT)),true)
+	@# Also save first-stage ramdisk metadata for boards retaining the SAR layout.
 	$(hide) $(call fs_config,$(zip_root)/BOOT/RAMDISK,) > $(zip_root)/META/boot_filesystem_config.txt
 endif
 ifneq ($(INSTALLED_RECOVERYIMAGE_TARGET),)

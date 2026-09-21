@@ -233,7 +233,9 @@ endif
 ###########################################
 # Now we can substitute with the real value of TARGET_COPY_OUT_RAMDISK
 ifeq ($(BOARD_BUILD_SYSTEM_ROOT_IMAGE),true)
+ifneq ($(BOARD_BOOT_RAMDISK_WITH_SYSTEM_ROOT),true)
 TARGET_COPY_OUT_RAMDISK := $(TARGET_COPY_OUT_ROOT)
+endif
 endif
 
 ###########################################

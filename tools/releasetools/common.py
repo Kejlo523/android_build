@@ -780,11 +780,11 @@ def GetBootableImage(name, prebuilt_name, unpack_dir, tree_subdir,
   if info_dict is None:
     info_dict = OPTIONS.info_dict
 
-  # With system_root_image == "true", we don't pack ramdisk into the boot image.
-  # Unless "recovery_as_boot" is specified, in which case we carry the ramdisk
-  # for recovery.
+  # Legacy SAR has no boot ramdisk. A separate first-stage ramdisk may be
+  # explicitly enabled while retaining the SAR system partition layout.
   has_ramdisk = (info_dict.get("system_root_image") != "true" or
                  prebuilt_name != "boot.img" or
+                 info_dict.get("boot_ramdisk_with_system_root") == "true" or
                  info_dict.get("recovery_as_boot") == "true")
 
   fs_config = "META/" + tree_subdir.lower() + "_filesystem_config.txt"
